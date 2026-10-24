@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Konversi Masehi Hijriah</title>
+<style>
+  :root { --bg:#0b1030; --kartu:#141a45; --teks:#f4f5ff; --redup:#b9bde0; --emas:#ffe05a; --garis:#2a3170; }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; background:var(--bg); color:var(--teks);
+         font-family: "Segoe UI", system-ui, sans-serif; display:flex; justify-content:center; padding:24px 16px; }
+  main { width:100%; max-width:440px; }
+  h1 { font-size:1.5rem; margin:0 0 4px; color:var(--emas); }
+  p.sub { margin:0 0 16px; color:var(--redup); }
+  .tab { display:flex; gap:6px; margin-bottom:12px; }
+  .tab button { flex:1; margin:0; padding:10px 6px; font-size:.95rem; background:var(--kartu);
+                color:var(--redup); border:1px solid var(--garis); }
+  .tab button[aria-pressed="true"] { background:var(--emas); color:#141a45; border-color:var(--emas); }
+  .kartu { background:var(--kartu); border-radius:16px; padding:20px; margin-bottom:16px; }
+  label { display:block; font-weight:600; margin-bottom:8px; }
+  .baris { display:flex; gap:8px; }
+  select, input { flex:1; min-width:0; font-size:1.1rem; padding:10px 8px; border-radius:10px; border:0; }
+  #tgl { flex:.7; } #bln { flex:1.7; }
+  .cek { display:flex; align-items:center; gap:10px; margin:14px 0 0; font-weight:400; color:var(--redup); }
+  .cek input { flex:none; width:20px; height:20px; padding:0; }
+  .dua { display:flex; gap:12px; } .dua > div { flex:1; min-width:0; }
+  button { width:100%; margin-top:14px; font-size:1.15rem; font-weight:700; padding:12px; border:0;
+           border-radius:12px; background:var(--emas); color:#141a45; cursor:pointer; }
+  .besar { font-size:1.45rem; font-weight:800; color:var(--emas); margin:4px 0 12px; }
+  .kecil { color:var(--redup); font-size:.92rem; line-height:1.5; }
+  #salah { color:#ff9c9c; margin-top:10px; min-height:1.2em; }
+  #hasil { display:none; }
+  details { margin-top:6px; }
+  summary { cursor:pointer; font-weight:600; color:var(--teks); }
+  ol { padding-left:20px; margin:10px 0 0; }
+  ol li { margin-bottom:8px; }
+  code { color:var(--emas); font-family: Consolas, monospace; font-size:.9rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Konversi Masehi ⇄ Hijriah</h1>
+  <p class="sub">Ubah tanggal, lihat hari dan wetonnya, dan lihat cara hitungnya.</p>
+
+  <div class="tab" role="group" aria-label="Arah konversi">
+    <button id="keH" aria-pressed="true">Masehi → Hijriah</button>
+    <button id="keM" aria-pressed="false">Hijriah → Masehi</button>
+  </div>
+
+  <div class="kartu">
+    <label id="judulInput">Tanggal Masehi</label>
+    <div class="baris">
+      <input id="tgl" type="number" min="1" max="31" placeholder="Tgl" aria-label="Tanggal">
+      <select id="bln" aria-label="Bulan"></select>
+      <input id="thn" type="number" placeholder="Tahun" aria-label="Tahun">
+    </div>
+    <label class="cek" id="kotakMaghrib"><input type="checkbox" id="maghrib"> Lahir/terjadi setelah maghrib</label>
+    <button id="hitung">Ubah</button>
+    <div class="kecil" id="salah" role="alert"></div>
+  </div>
+
+  <div class="kartu" id="hasil" aria-live="polite">
+    <div class="dua">
+      <div><div class="kecil">Hari</div><div class="besar" id="hari"></div></div>
+      <div><div class="kecil">Weton (Jawa)</div><div class="besar" id="weton"></div></div>
+    </div>
+    <div class="kecil" id="labelHasil"></div>
+    <div class="besar" id="tanggal"></div>
+    <details>
+      <summary>Lihat cara hitungnya</summary>
+      <ol class="kecil" id="langkah"></ol>
+    </details>
+  </div>
+
+  <p class="kecil">Hari dan weton dihitung pasti lewat Julian Day (JD), nomor urut hari yang dipakai ahli falak.
+    Tanggal Hijriah dan weton berganti saat maghrib, jadi yang lahir malam hari ikut hari berikutnya
+    (sebagian keluarga atau daerah memakai patokan lain).
+    Tanggal Hijriah memakai kalender hisab urfi (tabular), jadi bisa beda 1–2 hari dari kalender resmi
+    Kemenag, karena awal bulan resmi ditentukan lewat hisab dan rukyat hilal. Rentang: 1900–2100 M
+    (1317–1524 H).</p>
+  <p class="kecil">Dibuat oleh Langit Cilik.</p>
+</main>
+
+<script>
+// KALENDER-MULAI (sama dengan kalender.py)
+const HARI = ["Ahad", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+const BULAN_M = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus",
+                 "September", "Oktober", "November", "Desember"];
+const BULAN_H = ["Muharram", "Safar", "Rabiul Awal", "Rabiul Akhir", "Jumadil Awal", "Jumadil Akhir",
+                 "Rajab", "Syaban", "Ramadan", "Syawal", "Zulkaidah", "Zulhijah"];
+const EPOCH_H = 1948440;
+const div = (a, b) => Math.floor(a / b);
+
+function masehiKeJd(y, m, d) {
+  const a = div(14 - m, 12), y2 = y + 4800 - a, m2 = m + 12 * a - 3;
+  return d + div(153 * m2 + 2, 5) + 365 * y2 + div(y2, 4) - div(y2, 100) + div(y2, 400) - 32045;
+}
+function jdKeMasehi(jd) {
+  const a = jd + 32044, b = div(4 * a + 3, 146097), c = a - div(146097 * b, 4);
+  const d = div(4 * c + 3, 1461), e = c - div(1461 * d, 4), m = div(5 * e + 2, 153);
+  return [100 * b + d - 4800 + div(m, 10), m + 3 - 12 * div(m, 10), e - div(153 * m + 2, 5) + 1];
+}
+function hijriKeJd(y, m, d) {
+  return d + div(59 * (m - 1) + 1, 2) + 354 * (y - 1) + div(3 + 11 * y, 30) + EPOCH_H - 1;
+}
+function jdKeHijri(jd) {
+  const y = div(30 * (jd - EPOCH_H) + 10646, 10631);
+  let m = 1;
+  while (m < 12 && jd >= hijriKeJd(y, m + 1, 1)) m++;
+  return [y, m, jd - hijriKeJd(y, m, 1) + 1];
+}
+const hari = jd => HARI[(jd + 1) % 7];
+const PASARAN = ["Legi", "Pahing", "Pon", "Wage", "Kliwon"];
+const weton = jd => `${hari(jd)} ${PASARAN[jd % 5]}`;
+// KALENDER-SELESAI
+
+const $ = id => document.getElementById(id);
+const fmt = n => n.toLocaleString("id-ID");
+let keHijri = true;
+
+function isiBulan() {
+  const daftar = keHijri ? BULAN_M : BULAN_H, pilih = $("bln").value;
+  $("bln").innerHTML = "";
+  daftar.forEach((n, i) => $("bln").add(new Option(n, i + 1)));
+  if (pilih) $("bln").value = pilih;
+}
+function setArah(h) {
+  keHijri = h;
+  $("keH").setAttribute("aria-pressed", h);
+  $("keM").setAttribute("aria-pressed", !h);
+  $("judulInput").textContent = h ? "Tanggal Masehi" : "Tanggal Hijriah";
+  $("thn").placeholder = h ? "Tahun M" : "Tahun H";
+  $("kotakMaghrib").style.display = h ? "flex" : "none";
+  isiBulan();
+  $("hasil").style.display = "none";
+  $("salah").textContent = "";
+}
+$("keH").onclick = () => setArah(true);
+$("keM").onclick = () => setArah(false);
+
+$("hitung").onclick = () => {
+  const d = +$("tgl").value, m = +$("bln").value, y = +$("thn").value;
+  $("salah").textContent = "";
+  $("hasil").style.display = "none";
+  let jd, jw, langkah;
+  if (keHijri) {
+    const ok = y >= 1900 && y <= 2100 && new Date(Date.UTC(y, m - 1, d)).getUTCDate() === d;
+    if (!d || !ok) { $("salah").textContent = "Tanggal Masehi belum benar (rentang 1900–2100). Contoh: 17 Agustus 2015."; return; }
+    jd = masehiKeJd(y, m, d);
+    jw = $("maghrib").checked ? jd + 1 : jd;
+    const [hy, hm, hd] = jdKeHijri(jw), n = jw - EPOCH_H;
+    $("labelHasil").textContent = "Tanggal Hijriah (sekitar, bisa beda 1–2 hari)";
+    $("tanggal").textContent = `${hd} ${BULAN_H[hm - 1]} ${hy} H`;
+    langkah = [
+      `Ubah ${d} ${BULAN_M[m - 1]} ${y} jadi nomor Julian Day: <code>JD = ${fmt(jd)}</code>.`,
+      `Hari: sisa bagi <code>(JD + 1) ÷ 7 = ${(jd + 1) % 7}</code>. 0 = Ahad, 1 = Senin, dan seterusnya, jadi <b>${hari(jd)}</b>.`,
+      ...(jw !== jd ? [`Setelah maghrib, hari Hijriah dan weton sudah berganti, jadi keduanya memakai <code>JD + 1 = ${fmt(jw)}</code>.`] : []),
+      `Pasaran: sisa bagi <code>${fmt(jw)} ÷ 5 = ${jw % 5}</code>. 0 = Legi, 1 = Pahing, 2 = Pon, 3 = Wage, 4 = Kliwon, jadi weton <b>${weton(jw)}</b>.`,
+      `Jarak dari 1 Muharram 1 H (JD ${fmt(EPOCH_H)}): <code>${fmt(jw)} − ${fmt(EPOCH_H)} = ${fmt(n)}</code> hari.`,
+      `Kalender urfi: 30 tahun = 10.631 hari (19 tahun 354 hari, 11 tahun 355 hari). Tahun ke: <code>⌊(30 × ${fmt(n)} + 10.646) ÷ 10.631⌋ = ${hy}</code>.`,
+      `Bulan ganjil 30 hari, bulan genap 29 hari (Zulhijah 30 hari di tahun kabisat). Sisa harinya jatuh di <b>${hd} ${BULAN_H[hm - 1]}</b>.`,
+    ];
+  } else {
+    const ok = y >= 1317 && y <= 1524 && d >= 1 && d <= 30;
+    jd = ok ? hijriKeJd(y, m, d) : 0;
+    const cek = ok ? jdKeHijri(jd) : [];
+    if (!ok || cek[0] !== y || cek[1] !== m || cek[2] !== d) {
+      $("salah").textContent = ok ? `${d} ${BULAN_H[m - 1]} ${y} H tidak ada: bulan ini hanya 29 hari di kalender urfi.`
+                                  : "Tanggal Hijriah belum benar (rentang 1317–1524 H). Contoh: 1 Ramadan 1447.";
+      return;
+    }
+    const [gy, gm, gd] = jdKeMasehi(jd);
+    $("labelHasil").textContent = "Tanggal Masehi (sekitar, bisa beda 1–2 hari)";
+    $("tanggal").textContent = `${gd} ${BULAN_M[gm - 1]} ${gy}`;
+    langkah = [
+      `Hari yang sudah lewat sebelum tahun ${y} H: <code>354 × ${y - 1} + ⌊(3 + 11 × ${y}) ÷ 30⌋</code> (tambahan 1 hari tiap tahun kabisat).`,
+      `Tambah hari dari bulan sebelumnya (30, 29, 30, 29, ...) dan tanggalnya, lalu tambah JD 1 Muharram 1 H: <code>JD = ${fmt(jd)}</code>.`,
+      `Ubah nomor JD kembali ke kalender Masehi: <b>${gd} ${BULAN_M[gm - 1]} ${gy}</b>.`,
+      `Hari: sisa bagi <code>(JD + 1) ÷ 7 = ${(jd + 1) % 7}</code>, jadi <b>${hari(jd)}</b>.`,
+      `Pasaran: sisa bagi <code>JD ÷ 5 = ${jd % 5}</code>. 0 = Legi, 1 = Pahing, 2 = Pon, 3 = Wage, 4 = Kliwon, jadi weton <b>${weton(jd)}</b>.`,
+    ];
+    jw = jd;
+  }
+  $("hari").textContent = hari(jd);
+  $("weton").textContent = weton(jw);
+  $("langkah").innerHTML = langkah.map(t => `<li>${t}</li>`).join("");
+  $("hasil").style.display = "block";
+};
+
+isiBulan();
+</script>
+</body>
+</html>
