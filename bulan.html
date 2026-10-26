@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bulan Saat Aku Lahir</title>
+<meta name="description" content="Lihat bentuk bulan di malam kamu lahir, tanggal Hijriah, dan wetonmu. Belajar bulan dan kalender sambil bermain.">
+<style>
+  :root { --bg:#0b1030; --kartu:#141a45; --teks:#f4f5ff; --redup:#b9bde0; --emas:#ffe05a; --garis:#2a3170;
+          --terang:#fff3b0; --gelap:#262d63; --hijau:#7be0a5; --merah:#ff9c9c; }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; background:var(--bg); color:var(--teks);
+         font-family: "Segoe UI", system-ui, sans-serif; display:flex; justify-content:center; padding:24px 16px; }
+  main { width:100%; max-width:480px; }
+  h1 { font-size:1.6rem; margin:0 0 4px; color:var(--emas); }
+  h2 { font-size:1.2rem; margin:0 0 10px; color:var(--emas); }
+  p.sub { margin:0 0 16px; color:var(--redup); }
+  .kartu { background:var(--kartu); border-radius:16px; padding:20px; margin-bottom:16px; }
+  label { display:block; font-weight:600; margin-bottom:8px; }
+  .baris { display:flex; gap:8px; }
+  select, input { flex:1; min-width:0; font-size:1.1rem; padding:10px 8px; border-radius:10px; border:0; }
+  #nama { width:100%; margin-bottom:12px; }
+  #tgl { flex:.7; } #bln { flex:1.7; }
+  .cek { display:flex; align-items:center; gap:10px; margin:14px 0 0; font-weight:400; color:var(--redup); }
+  .cek input { flex:none; width:20px; height:20px; padding:0; }
+  button { width:100%; margin-top:14px; font-size:1.15rem; font-weight:700; padding:12px; border:0;
+           border-radius:12px; background:var(--emas); color:#141a45; cursor:pointer; }
+  button.kedua { background:transparent; color:var(--emas); border:2px solid var(--emas); }
+  .besar { font-size:1.4rem; font-weight:800; color:var(--emas); margin:2px 0 10px; }
+  .kecil { color:var(--redup); font-size:.92rem; line-height:1.5; }
+  #salah { color:var(--merah); margin-top:10px; min-height:1.2em; }
+  #hasil { display:none; }
+  .bulan { display:block; margin:6px auto 10px; }
+  .tengah { text-align:center; }
+  .dua { display:flex; gap:12px; } .dua > div { flex:1; min-width:0; }
+  input[type=range] { width:100%; padding:0; margin:12px 0 4px; accent-color:var(--emas); }
+  table { width:100%; border-collapse:collapse; margin-top:6px; }
+  td, th { padding:8px 4px; border-bottom:1px solid var(--garis); text-align:left; font-size:.95rem; }
+  th { color:var(--redup); font-weight:600; }
+  td.maju { color:var(--hijau); }
+  .soal { margin-bottom:18px; }
+  .soal p { margin:0 0 8px; font-weight:600; }
+  .pilihan button { margin-top:6px; font-size:1rem; padding:10px; background:var(--gelap); color:var(--teks);
+                    border:1px solid var(--garis); text-align:left; }
+  .pilihan button.benar { background:#1f5c3d; border-color:var(--hijau); }
+  .pilihan button.keliru { background:#5c1f2a; border-color:var(--merah); }
+  .jelas { margin-top:6px; }
+  #skor { font-size:1.2rem; font-weight:700; color:var(--emas); }
+  #ajakan { border:2px solid var(--emas); }
+  a { color:var(--emas); }
+</style>
+</head>
+<body>
+<main>
+  <h1>🌙 Bulan Saat Aku Lahir</h1>
+  <p class="sub">Seperti apa bentuk bulan di malam kamu lahir? Cari tahu, lalu bagikan kartunya ke keluarga.</p>
+
+  <div class="kartu">
+    <label for="nama">Nama</label>
+    <input id="nama" type="text" maxlength="24" placeholder="Nama anak" autocomplete="off">
+    <label>Tanggal lahir</label>
+    <div class="baris">
+      <input id="tgl" type="number" min="1" max="31" placeholder="Tgl" aria-label="Tanggal">
+      <select id="bln" aria-label="Bulan"></select>
+      <input id="thn" type="number" placeholder="Tahun" aria-label="Tahun">
+    </div>
+    <label class="cek"><input type="checkbox" id="maghrib"> Lahir setelah maghrib</label>
+    <button id="lihat">Lihat bulanku</button>
+    <div class="kecil" id="salah" role="alert"></div>
+  </div>
+
+  <div class="kartu tengah" id="hasil" aria-live="polite">
+    <div class="kecil" id="judulHasil"></div>
+    <svg class="bulan" id="bulanLahir" width="170" height="170" viewBox="0 0 200 200" role="img"></svg>
+    <div class="besar" id="fase"></div>
+    <div class="dua">
+      <div><div class="kecil">Tanggal Hijriah</div><div class="besar" id="hijriah"></div></div>
+      <div><div class="kecil">Weton</div><div class="besar" id="weton"></div></div>
+    </div>
+    <div class="kecil" id="cerita"></div>
+    <button id="bagikan">Bagikan kartu ke keluarga</button>
+    <button class="kedua" id="unduh">Simpan gambar</button>
+  </div>
+
+  <div class="kartu">
+    <h2>Geser waktu, lihat bulan berubah</h2>
+    <p class="kecil">Kalender Hijriah mengikuti bulan. Coba geser: di tanggal 14–15 Hijriah bulannya hampir bulat penuh.</p>
+    <svg class="bulan" id="bulanGeser" width="140" height="140" viewBox="0 0 200 200" role="img"></svg>
+    <div class="tengah"><div class="besar" id="faseGeser"></div></div>
+    <input type="range" id="geser" min="-20" max="40" value="0" aria-label="Geser hari">
+    <div class="dua">
+      <div><div class="kecil">Masehi</div><div id="masehiGeser"></div></div>
+      <div><div class="kecil">Hijriah</div><div id="hijriahGeser"></div></div>
+    </div>
+  </div>
+
+  <div class="kartu">
+    <h2>Kenapa Ramadan datang makin awal?</h2>
+    <p class="kecil">Satu tahun Hijriah = 12 kali bulan purnama ≈ 354 hari. Satu tahun Masehi = 365 hari.
+      Selisihnya sekitar 11 hari, jadi Ramadan maju terus tiap tahun.</p>
+    <table><thead><tr><th>1 Ramadan</th><th>Masehi (sekitar)</th><th>Maju</th></tr></thead>
+      <tbody id="ramadan"></tbody></table>
+  </div>
+
+  <div class="kartu">
+    <h2>Kuis Langit ⭐</h2>
+    <div id="kuis"></div>
+    <div id="skor"></div>
+  </div>
+
+  <div class="kartu" id="ajakan">
+    <h2>Paket Ramadan Anak</h2>
+    <p class="kecil">Jurnal puasa, lembar pengamatan bulan tiap malam, dan lencana amal baik. Siap cetak, tanpa gambar wajah.</p>
+    <button id="tombolPaket">Mau, kabari saya</button>
+  </div>
+
+  <p class="kecil">Bentuk bulan dihitung dari rata-rata putaran bulan (29,53 hari), jadi bisa geser sekitar setengah hari.
+    Tanggal Hijriah memakai hisab urfi (tabular) dan bisa beda 1–2 hari dari kalender resmi Kemenag.
+    Rentang: 1900–2100. <a href="index.html">Konversi Masehi ⇄ Hijriah</a></p>
+  <p class="kecil">Dibuat oleh Langit Cilik.</p>
+</main>
+
+<canvas id="kanvas" width="1080" height="1350" hidden></canvas>
+
+<script>
+// Isi dengan link toko (Lynk/Mayar) atau wa.me untuk Paket Ramadan Anak.
+const LINK_PAKET = "";
+
+// KALENDER-MULAI (sama dengan kalender.py)
+const HARI = ["Ahad", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+const BULAN_M = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus",
+                 "September", "Oktober", "November", "Desember"];
+const BULAN_H = ["Muharram", "Safar", "Rabiul Awal", "Rabiul Akhir", "Jumadil Awal", "Jumadil Akhir",
+                 "Rajab", "Syaban", "Ramadan", "Syawal", "Zulkaidah", "Zulhijah"];
+const EPOCH_H = 1948440;
+const div = (a, b) => Math.floor(a / b);
+
+function masehiKeJd(y, m, d) {
+  const a = div(14 - m, 12), y2 = y + 4800 - a, m2 = m + 12 * a - 3;
+  return d + div(153 * m2 + 2, 5) + 365 * y2 + div(y2, 4) - div(y2, 100) + div(y2, 400) - 32045;
+}
+function jdKeMasehi(jd) {
+  const a = jd + 32044, b = div(4 * a + 3, 146097), c = a - div(146097 * b, 4);
+  const d = div(4 * c + 3, 1461), e = c - div(1461 * d, 4), m = div(5 * e + 2, 153);
+  return [100 * b + d - 4800 + div(m, 10), m + 3 - 12 * div(m, 10), e - div(153 * m + 2, 5) + 1];
+}
+function hijriKeJd(y, m, d) {
+  return d + div(59 * (m - 1) + 1, 2) + 354 * (y - 1) + div(3 + 11 * y, 30) + EPOCH_H - 1;
+}
+function jdKeHijri(jd) {
+  const y = div(30 * (jd - EPOCH_H) + 10646, 10631);
+  let m = 1;
+  while (m < 12 && jd >= hijriKeJd(y, m + 1, 1)) m++;
+  return [y, m, jd - hijriKeJd(y, m, 1) + 1];
+}
+const hari = jd => HARI[(jd + 1) % 7];
+const PASARAN = ["Legi", "Pahing", "Pon", "Wage", "Kliwon"];
+const weton = jd => `${hari(jd)} ${PASARAN[jd % 5]}`;
+// KALENDER-SELESAI
+
+// Umur bulan (hari sejak bulan baru) pada malam tanggal JD, memakai bulan sinodis rata-rata.
+// JD bulat = pukul 12.00 UT = 19.00 WIB. Bulan baru acuan: 6 Januari 2000, JD 2451550,1.
+const SINODIS = 29.530588853;
+const umurBulan = jd => (((jd - 2451550.1) % SINODIS) + SINODIS) % SINODIS;
+
+const FASE = [
+  [1.5, "Bulan Baru", "Bulan ada di antara Bumi dan Matahari, jadi sisi terangnya membelakangi kita."],
+  [6.4, "Bulan Sabit", "Sabit tipis yang muncul setelah bulan baru disebut hilal, tanda awal bulan Hijriah."],
+  [8.4, "Bulan Separuh", "Separuh bulan terang. Bulan sudah berjalan seperempat putarannya."],
+  [13.8, "Bulan Cembung", "Bagian terangnya makin besar setiap malam, menuju purnama."],
+  [15.8, "Bulan Purnama", "Bulan bulat penuh! Biasanya terjadi sekitar tanggal 14–15 Hijriah."],
+  [21.1, "Bulan Cembung", "Setelah purnama, bagian terangnya mulai mengecil lagi."],
+  [23.1, "Bulan Separuh", "Separuh bulan terang lagi, kali ini sisi sebaliknya."],
+  [28.0, "Bulan Sabit", "Sabit tipis terakhir, terlihat menjelang subuh."],
+  [SINODIS, "Bulan Baru", "Bulan ada di antara Bumi dan Matahari, jadi sisi terangnya membelakangi kita."],
+];
+const fase = umur => FASE.find(f => umur < f[0]);
+
+// Path SVG bagian bulan yang terang. Bulan membesar terang di kanan, mengecil terang di kiri.
+function pathTerang(umur, cx, cy, r) {
+  const t = 2 * Math.PI * umur / SINODIS, rx = Math.abs(r * Math.cos(t)), naik = umur < SINODIS / 2;
+  const sabit = Math.cos(t) > 0;
+  return `M ${cx} ${cy - r} A ${r} ${r} 0 0 ${naik ? 1 : 0} ${cx} ${cy + r} ` +
+         `A ${rx} ${r} 0 0 ${naik === sabit ? 0 : 1} ${cx} ${cy - r} Z`;
+}
+function gambarBulan(svg, umur) {
+  svg.innerHTML = `<circle cx="100" cy="100" r="92" fill="var(--gelap)"/>` +
+                  `<path d="${pathTerang(umur, 100, 100, 92)}" fill="var(--terang)"/>`;
+  svg.setAttribute("aria-label", fase(umur)[1]);
+}
+
+const $ = id => document.getElementById(id);
+const teksMasehi = jd => { const [y, m, d] = jdKeMasehi(jd); return `${d} ${BULAN_M[m - 1]} ${y}`; };
+const teksHijri = jd => { const [y, m, d] = jdKeHijri(jd); return `${d} ${BULAN_H[m - 1]} ${y} H`; };
+
+BULAN_M.forEach((n, i) => $("bln").add(new Option(n, i + 1)));
+
+// --- Bulan saat aku lahir ---
+let kartu = null;
+$("lihat").onclick = () => {
+  const d = +$("tgl").value, m = +$("bln").value, y = +$("thn").value;
+  const nama = $("nama").value.trim() || "aku";
+  $("salah").textContent = "";
+  $("hasil").style.display = "none";
+  if (!d || y < 1900 || y > 2100 || new Date(Date.UTC(y, m - 1, d)).getUTCDate() !== d) {
+    $("salah").textContent = "Tanggal lahir belum benar (rentang 1900–2100). Contoh: 17 Agustus 2015.";
+    return;
+  }
+  const jd = masehiKeJd(y, m, d), jw = $("maghrib").checked ? jd + 1 : jd;
+  const umur = umurBulan(jd), [, namaFase, penjelasan] = fase(umur);
+  kartu = { nama, umur, namaFase, masehi: teksMasehi(jd), hari: hari(jd), hijri: teksHijri(jw), weton: weton(jw) };
+  $("judulHasil").textContent = `Malam ${kartu.hari}, ${kartu.masehi}, saat ${nama} lahir, langit menampilkan`;
+  gambarBulan($("bulanLahir"), umur);
+  $("fase").textContent = namaFase;
+  $("hijriah").textContent = kartu.hijri;
+  $("weton").textContent = kartu.weton;
+  $("cerita").textContent = `Umur bulan saat itu sekitar ${Math.round(umur)} hari. ${penjelasan}`;
+  $("hasil").style.display = "block";
+};
+
+function buatKartu() {
+  const c = $("kanvas"), g = c.getContext("2d"), W = c.width;
+  g.fillStyle = "#0b1030"; g.fillRect(0, 0, W, c.height);
+  g.fillStyle = "#ffffff";
+  for (let i = 0; i < 120; i++) {
+    const x = Math.random() * W, y = Math.random() * c.height;
+    if (x > 180 && x < W - 180 && (y < 240 || y > 880)) continue; // jangan menimpa tulisan
+    g.globalAlpha = .3 + Math.random() * .6;
+    g.beginPath(); g.arc(x, y, 1 + Math.random() * 2.5, 0, 7); g.fill();
+  }
+  g.globalAlpha = 1; g.textAlign = "center";
+  g.fillStyle = "#b9bde0"; g.font = "500 44px system-ui, sans-serif";
+  g.fillText(`Bulan saat ${kartu.nama} lahir`, W / 2, 130);
+  g.fillText(`${kartu.hari}, ${kartu.masehi}`, W / 2, 195);
+  g.fillStyle = "#262d63"; g.beginPath(); g.arc(W / 2, 560, 300, 0, 7); g.fill();
+  g.fillStyle = "#fff3b0"; g.fill(new Path2D(pathTerang(kartu.umur, W / 2, 560, 300)));
+  g.fillStyle = "#ffe05a"; g.font = "800 88px system-ui, sans-serif";
+  g.fillText(kartu.namaFase, W / 2, 1000);
+  g.fillStyle = "#f4f5ff"; g.font = "600 52px system-ui, sans-serif";
+  g.fillText(kartu.hijri, W / 2, 1090);
+  g.fillText(`Weton ${kartu.weton}`, W / 2, 1160);
+  g.fillStyle = "#b9bde0"; g.font = "500 36px system-ui, sans-serif";
+  g.fillText("Cek bulanmu di Langit Cilik", W / 2, 1270);
+  return new Promise(ok => c.toBlob(ok, "image/png"));
+}
+function unduh(blob) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `bulan-${kartu.nama.replace(/\W+/g, "-").toLowerCase()}.png`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+$("unduh").onclick = async () => unduh(await buatKartu());
+$("bagikan").onclick = async () => {
+  const blob = await buatKartu(), file = new File([blob], "bulan-lahir.png", { type: "image/png" });
+  const teks = `Saat ${kartu.nama} lahir, bulannya ${kartu.namaFase}! Cek bulan saat kamu lahir:`;
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], text: `${teks} ${location.href}` }); } catch (e) {}
+  } else unduh(blob);
+};
+
+// --- Geser waktu ---
+const now = new Date(), jdHariIni = masehiKeJd(now.getFullYear(), now.getMonth() + 1, now.getDate());
+function geser() {
+  const n = +$("geser").value, jd = jdHariIni + n, umur = umurBulan(jd);
+  gambarBulan($("bulanGeser"), umur);
+  $("faseGeser").textContent = fase(umur)[1];
+  $("masehiGeser").textContent = (n === 0 ? "Hari ini, " : "") + teksMasehi(jd);
+  $("hijriahGeser").textContent = teksHijri(jd);
+}
+$("geser").oninput = geser;
+geser();
+
+// --- Ramadan maju ---
+{
+  const [hy, hm] = jdKeHijri(jdHariIni);
+  let sebelum = null, baris = "";
+  for (let y = hm <= 9 ? hy : hy + 1, i = 0; i < 6; y++, i++) {
+    const jd = hijriKeJd(y, 9, 1), [gy, gm, gd] = jdKeMasehi(jd);
+    // Maju = jarak dari 1 Ramadan ini ke tanggal Masehi yang sama tahun sebelumnya + 1 tahun.
+    let maju = "–";
+    if (sebelum) { const [py, pm, pd] = jdKeMasehi(sebelum); maju = `${masehiKeJd(py + 1, pm, pd) - jd} hari lebih awal`; }
+    baris += `<tr><td>${y} H</td><td>${gd} ${BULAN_M[gm - 1]} ${gy}</td><td class="maju">${maju}</td></tr>`;
+    sebelum = jd;
+  }
+  $("ramadan").innerHTML = baris;
+}
+
+// --- Kuis ---
+const SOAL = [
+  ["Tanggal 15 Hijriah, bulan biasanya berbentuk…", ["Sabit tipis", "Purnama", "Tidak terlihat"], 1,
+   "Kalender Hijriah mengikuti bulan, jadi pertengahan bulan Hijriah = purnama."],
+  ["Dari purnama ke purnama berikutnya butuh berapa hari?", ["7 hari", "29–30 hari", "365 hari"], 1,
+   "Bulan butuh sekitar 29,5 hari untuk kembali ke bentuk yang sama."],
+  ["Kenapa Ramadan tiap tahun datang lebih awal di kalender Masehi?",
+   ["Tahun Hijriah sekitar 11 hari lebih pendek", "Bumi berputar makin cepat", "Karena libur sekolah"], 0,
+   "12 bulan Hijriah ≈ 354 hari, sedangkan tahun Masehi 365 hari."],
+  ["Weton (misalnya Kamis Pahing) berulang setiap berapa hari?", ["5 hari", "7 hari", "35 hari"], 2,
+   "Ada 7 hari dan 5 pasaran. 7 × 5 = 35 hari, disebut selapan."],
+];
+let skor = 0, dijawab = 0;
+$("kuis").innerHTML = SOAL.map(([t, p], i) =>
+  `<div class="soal"><p>${i + 1}. ${t}</p><div class="pilihan">` +
+  p.map((x, j) => `<button data-s="${i}" data-j="${j}">${x}</button>`).join("") +
+  `</div><div class="kecil jelas" id="jelas${i}"></div></div>`).join("");
+$("kuis").onclick = e => {
+  const b = e.target.closest("button[data-s]");
+  if (!b || b.parentNode.dataset.selesai) return;
+  const i = +b.dataset.s, [, , kunci, alasan] = SOAL[i], benar = +b.dataset.j === kunci;
+  b.parentNode.dataset.selesai = 1;
+  b.classList.add(benar ? "benar" : "keliru");
+  b.parentNode.children[kunci].classList.add("benar");
+  $("jelas" + i).textContent = (benar ? "Benar! " : "Belum tepat. ") + alasan;
+  skor += benar; dijawab++;
+  if (dijawab === SOAL.length)
+    $("skor").textContent = `Skormu ${skor}/${SOAL.length} ` + "⭐".repeat(skor) + (skor === SOAL.length ? " Hebat!" : "");
+};
+
+// --- Ajakan ---
+$("tombolPaket").onclick = () => {
+  if (LINK_PAKET) location.href = LINK_PAKET;
+  else $("tombolPaket").textContent = "Segera hadir, insyaallah!";
+};
+</script>
+</body>
+</html>
