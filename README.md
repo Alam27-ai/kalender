@@ -19,3 +19,13 @@ Halaman edukasi anak, juga jalan offline:
 - Isi `LINK_PAKET` di awal skrip dengan link toko atau wa.me untuk tombol Paket Ramadan Anak.
 
 Dibuat oleh Langit Cilik.
+
+## Paket Ramadan Anak (`paket-ramadan/`)
+
+Jurnal Ramadan anak siap cetak, A4, 39 halaman: sampul, petunjuk orang tua, target, peta 30 hari,
+lembar pengamatan bulan, 30 halaman harian (bentuk bulan perkiraan + fakta), cari kata, lencana, sertifikat.
+
+- `node paket-ramadan/buat-pdf.js` membuat `Jurnal-Ramadan-Langit-Cilik.pdf` dan gambar `pratinjau/` untuk toko.
+- `node paket-ramadan/buat-pdf.js Aisyah` membuat versi personal dengan nama anak di sampul dan sertifikat.
+- Ganti tahun dengan membuka `jurnal.html?tahun=1449`.
+- Font Baloo 2 dan Nunito (SIL Open Font License) ada di `paket-ramadan/font/`.
