@@ -27,6 +27,8 @@ lembar pengamatan bulan, 30 halaman harian (bentuk bulan perkiraan + fakta), car
 - `node paket-ramadan/buat-pdf.js` membuat `Jurnal-Ramadan-Langit-Cilik.pdf` dan gambar `pratinjau/` untuk toko.
 - `node paket-ramadan/buat-pdf.js Aisyah` membuat versi personal dengan nama anak di sampul dan sertifikat.
 - Ganti tahun dengan membuka `jurnal.html?tahun=1449`.
+- Versi bahasa Inggris (untuk Etsy): `node paket-ramadan/buat-pdf.js --en` membuat `Ramadan-Journal-Langit-Cilik.pdf`
+  dan pratinjau di `pratinjau/en/`. Bisa digabung dengan nama: `--en Aisha`. Di browser: `jurnal.html?lang=en`.
 - Font Baloo 2 dan Nunito (SIL Open Font License) ada di `paket-ramadan/font/`.
 
 Dibuat oleh Langit Cilik.

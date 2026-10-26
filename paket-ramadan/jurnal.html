@@ -97,10 +97,14 @@
 <body>
 <div id="buku"></div>
 <script>
-// Pakai ?nama=Aisyah untuk versi personal, ?tahun=1449 untuk tahun lain.
+// Pakai ?nama=Aisyah untuk versi personal, ?tahun=1449 untuk tahun lain, ?lang=en untuk bahasa Inggris.
 const q = new URLSearchParams(location.search);
 const NAMA = (q.get("nama") || "").slice(0, 24), TAHUN = +q.get("tahun") || 1448;
-const MEREK = "Langit Cilik";
+const MEREK = "Langit Cilik", EN = q.get("lang") === "en";
+const t = (id, en) => EN ? en : id;
+const TH = `${TAHUN} ${t("H", "AH")}`;
+document.documentElement.lang = t("id", "en");
+document.title = t("Jurnal Ramadan Langit Cilik", "Ramadan Journal Langit Cilik");
 const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 
 // Sama dengan bulan.html: bagian terang bulan menurut umur bulan (hari sejak bulan baru).
@@ -119,11 +123,27 @@ const umurHari = n => n + 0.5;
 
 let nomor = 0;
 const hal = (isi, kelas = "") => `<section class="hal ${kelas}">${isi}` +
-  (kelas.includes("sampul") ? "" : `<div class="kaki"><span>Jurnal Ramadan ${TAHUN} H · ${MEREK}</span><span>${++nomor}</span></div>`) +
+  (kelas.includes("sampul") ? "" : `<div class="kaki"><span>${t("Jurnal Ramadan", "Ramadan Journal")} ${TH} · ${MEREK}</span><span>${++nomor}</span></div>`) +
   `</section>`;
 const garis = n => '<div class="garis"></div>'.repeat(n);
 
-const FAKTA = [
+const FAKTA = EN ? [
+  "The Moon takes about <b>29.5 days</b> to return to the same shape.",
+  "Moonlight is really <b>sunlight bouncing off the Moon</b>.",
+  "The Moon is about <b>384,000 km (239,000 miles)</b> away. Driving nonstop would take more than 5 months!",
+  "The <b>hilal</b> is the first thin crescent seen after the new moon.",
+  "The Moon always shows <b>the same side</b> to Earth.",
+  "The Hijri calendar has <b>12 months</b>, each 29 or 30 days long.",
+  "Ramadan is the <b>9th month</b> of the Hijri calendar.",
+  "At <b>full moon</b>, the Moon rises in the east as the Sun sets in the west.",
+  "Gravity on the Moon is only about <b>1/6</b> of Earth's. You could jump 6 times higher!",
+  "At <b>new moon</b>, the bright side faces away from Earth, so we can't see it.",
+  "Ocean tides are mostly caused by the <b>Moon's gravity</b>.",
+  "People first landed on the Moon in <b>1969</b>.",
+  "The Moon is about <b>a quarter</b> as wide as Earth.",
+  "At the end of a Hijri month, the crescent appears in the <b>east before dawn</b>.",
+  "<b>Zakat al-Fitr</b> is given before the Eid prayer.",
+] : [
   "Bulan butuh sekitar <b>29,5 hari</b> untuk kembali ke bentuk yang sama.",
   "Cahaya bulan sebenarnya adalah <b>pantulan cahaya Matahari</b>.",
   "Jarak Bumi ke Bulan sekitar <b>384.000 km</b>. Naik mobil tanpa berhenti butuh lebih dari 5 bulan!",
@@ -152,13 +172,35 @@ for (let i = 0; i < 40; i++) {
 }
 buku.push(hal(`${bintang}
   ${bulan(4, 70)}
-  <h1>Jurnal Ramadan</h1>
-  <div class="anak">Catatan puasa & pengamat bulan cilik · ${TAHUN} H</div>
-  <div class="milik">Milik: <b>${esc(NAMA)}</b></div>
+  <h1>${t("Jurnal Ramadan", "Ramadan Journal")}</h1>
+  <div class="anak">${t("Catatan puasa & pengamat bulan cilik", "Fasting diary & little moon watcher")} · ${TH}</div>
+  <div class="milik">${t("Milik", "This journal belongs to")}: <b>${esc(NAMA)}</b></div>
   <div class="merek">${MEREK}</div>`, "sampul"));
 
 // 2. Untuk Ayah & Bunda
-buku.push(hal(`<span class="pita">Untuk Ayah & Bunda</span>
+buku.push(hal(EN ? `<span class="pita">For Parents</span>
+  <h2>How to use this journal</h2><br>
+  <div class="kotak lembut">
+    <p><b>1. One page a day.</b> Fill it in together after iftar or before bed. 5–10 minutes is enough.</p>
+    <p><b>2. Write the date yourself.</b> The start of Ramadan depends on your local moon sighting or announcement, so the pages use “Day 1, Day 2, …”.</p>
+    <p><b>3. Go moon watching.</b> Early in Ramadan, look for a thin crescent in the western sky after sunset. Mid-month, the full moon rises in the east. Draw what you see on the observation page.</p>
+    <p><b>4. Celebrate effort, not just results.</b> A half-day fast for a young child is worth celebrating too. Cut out the badges at the back as rewards.</p>
+    <p style="margin:0"><b>5. At the end of Ramadan</b>, fill in the certificate and sign it together.</p>
+  </div>
+  <div class="kotak krem">
+    <h3>Inside this journal</h3>
+    <p style="margin:0">My Ramadan goals · 30-day fasting map · Moon observation page · 30 daily pages ·
+      Word search · Good deed badges · Certificate</p>
+  </div>
+  <div class="kotak lembut"><h3>Fun ideas to do together</h3>
+    <p>🍲 Make iftar snacks together and share them with neighbors.</p>
+    <p>🔭 Go “hilal hunting” on the first evening of Ramadan and before Eid.</p>
+    <p>🪙 Turn an old tin into a charity jar and open it at the end of Ramadan.</p>
+    <p style="margin:0">⭐ Decorate a room with paper moons and stars for the last ten nights.</p>
+  </div>
+  <p style="font-size:10pt">The moon shapes in this journal are estimates and may differ slightly from the real sky.
+    They are drawn as seen from the Northern Hemisphere; south of the equator the moon looks flipped.
+    That's the fun part: compare them with your own observations!</p>` : `<span class="pita">Untuk Ayah & Bunda</span>
   <h2>Cara memakai jurnal ini</h2><br>
   <div class="kotak lembut">
     <p><b>1. Satu halaman satu hari.</b> Isi bersama anak setelah berbuka atau sebelum tidur, cukup 5–10 menit.</p>
@@ -182,60 +224,68 @@ buku.push(hal(`<span class="pita">Untuk Ayah & Bunda</span>
     Justru itu serunya: bandingkan dengan pengamatan sendiri!</p>`));
 
 // 3. Target
-buku.push(hal(`<span class="pita">Bismillah</span><h2>Target Ramadanku</h2><br>
+buku.push(hal(`<span class="pita">Bismillah</span><h2>${t("Target Ramadanku", "My Ramadan Goals")}</h2><br>
   <div class="grid2">
-    <div class="kotak krem"><h3>🌙 Puasa</h3><p>Aku mau berpuasa penuh ______ hari.</p></div>
-    <div class="kotak krem"><h3>📖 Mengaji</h3><p>Aku mau membaca ______ halaman / juz.</p></div>
-    <div class="kotak krem"><h3>🤲 Sedekah</h3><p>Aku mau bersedekah kepada:</p>${garis(1)}</div>
-    <div class="kotak krem"><h3>⭐ Kebiasaan baru</h3><p>Kebiasaan baik yang mau aku mulai:</p>${garis(1)}</div>
+    <div class="kotak krem"><h3>🌙 ${t("Puasa", "Fasting")}</h3><p>${t("Aku mau berpuasa penuh ______ hari.", "I want to fast ______ full days.")}</p></div>
+    <div class="kotak krem"><h3>📖 ${t("Mengaji", "Quran")}</h3><p>${t("Aku mau membaca ______ halaman / juz.", "I want to read ______ pages / juz.")}</p></div>
+    <div class="kotak krem"><h3>🤲 ${t("Sedekah", "Charity")}</h3><p>${t("Aku mau bersedekah kepada:", "I want to give to:")}</p>${garis(1)}</div>
+    <div class="kotak krem"><h3>⭐ ${t("Kebiasaan baru", "New habit")}</h3><p>${t("Kebiasaan baik yang mau aku mulai:", "A good habit I want to start:")}</p>${garis(1)}</div>
   </div>
-  <div class="kotak lembut"><h3>Hafalan surat atau doa yang ingin aku kuasai</h3>${garis(5)}</div>
-  <div class="kotak lembut"><h3>Setelah Ramadan, aku ingin menjadi anak yang…</h3>${garis(5)}</div>
-  <div class="kotak krem" style="flex:1"><h3>🖍️ Gambar suasana Lebaran impianku</h3></div>`));
+  <div class="kotak lembut"><h3>${t("Hafalan surat atau doa yang ingin aku kuasai", "A surah or dua I want to memorize")}</h3>${garis(5)}</div>
+  <div class="kotak lembut"><h3>${t("Setelah Ramadan, aku ingin menjadi anak yang…", "After Ramadan, I want to be someone who…")}</h3>${garis(5)}</div>
+  <div class="kotak krem" style="flex:1"><h3>🖍️ ${t("Gambar suasana Lebaran impianku", "Draw my dream Eid celebration")}</h3></div>`));
 
 // 4. Peta 30 hari
-buku.push(hal(`<span class="pita">Peta Puasaku</span><h2>30 Hari Ramadan</h2>
-  <p>Centang kotak setiap hari kamu berpuasa. Kotak ★ adalah malam ganjil di 10 malam terakhir.</p>
+buku.push(hal(`<span class="pita">${t("Peta Puasaku", "My Fasting Map")}</span><h2>${t("30 Hari Ramadan", "30 Days of Ramadan")}</h2>
+  <p>${t("Centang kotak setiap hari kamu berpuasa. Kotak ★ adalah malam ganjil di 10 malam terakhir.",
+         "Tick the box for every day you fast. ★ marks the odd nights of the last ten nights.")}</p>
   <div class="peta">${Array.from({ length: 30 }, (_, i) => {
     const n = i + 1;
     return `<div class="${n >= 21 && n % 2 ? "ganjil" : ""}">${bulan(umurHari(n), 11)}<span>${n}</span><i class="kecil"></i></div>`;
   }).join("")}</div>`));
 
 // 5. Pengamatan bulan
-buku.push(hal(`<span class="pita">Pengamat Bulan Cilik</span><h2>Bulan yang Aku Lihat</h2>
-  <p>Setiap malam, lihat bulan lalu arsir bagian yang gelap. Kalau mendung, tulis “awan”.</p>
-  <div class="kotak lembut" style="font-size:10.5pt">
-    <b>Awal Ramadan:</b> sabit tipis di <b>barat</b> setelah maghrib. ·
+buku.push(hal(`<span class="pita">${t("Pengamat Bulan Cilik", "Little Moon Watcher")}</span><h2>${t("Bulan yang Aku Lihat", "The Moon I Saw")}</h2>
+  <p>${t("Setiap malam, lihat bulan lalu arsir bagian yang gelap. Kalau mendung, tulis “awan”.",
+         "Each evening, look at the moon and shade the dark part. If it's cloudy, write “clouds”.")}</p>
+  <div class="kotak lembut" style="font-size:10.5pt">${t(
+    `<b>Awal Ramadan:</b> sabit tipis di <b>barat</b> setelah maghrib. ·
     <b>Pertengahan:</b> purnama terbit di <b>timur</b>. ·
-    <b>Akhir Ramadan:</b> bulan terbit larut malam, coba lihat menjelang subuh.
+    <b>Akhir Ramadan:</b> bulan terbit larut malam, coba lihat menjelang subuh.`,
+    `<b>Start of Ramadan:</b> a thin crescent in the <b>west</b> after sunset. ·
+    <b>Middle:</b> the full moon rises in the <b>east</b>. ·
+    <b>End of Ramadan:</b> the moon rises late at night, so look before dawn.`)}
   </div>
   <div class="amat">${Array.from({ length: 30 }, (_, i) => `<div>${kosong(25)}<br>${i + 1}</div>`).join("")}</div>`));
 
 // 6. Halaman harian
+const SALAT = EN ? ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha", "Taraweeh"] : ["Subuh", "Zuhur", "Asar", "Magrib", "Isya", "Tarawih"];
 for (let n = 1; n <= 30; n++) {
   buku.push(hal(`<div class="atas">
-      <div><span class="pita">Ramadan</span><h2 class="hari">Hari ke-${n}</h2>
-        <div class="tanggal">Tanggal: ______ / ______ / ________</div></div>
-      <div class="bulanmalam"><div>${bulan(umurHari(n), 24)}<br>Perkiraan</div><div>${kosong(24)}<br>Yang aku lihat</div></div>
+      <div><span class="pita">Ramadan</span><h2 class="hari">${t(`Hari ke-${n}`, `Day ${n}`)}</h2>
+        <div class="tanggal">${t("Tanggal", "Date")}: ______ / ______ / ________</div></div>
+      <div class="bulanmalam"><div>${bulan(umurHari(n), 24)}<br>${t("Perkiraan", "Estimate")}</div><div>${kosong(24)}<br>${t("Yang aku lihat", "What I saw")}</div></div>
     </div>
-    <div class="kotak krem"><h3>Puasaku hari ini</h3>
-      <span class="cek bulat">Penuh</span><span class="cek bulat">Setengah hari</span><span class="cek bulat">Sedang belajar</span>
-      <div class="grid2" style="margin-top:3mm"><div>Menu sahur: ____________________</div><div>Menu buka: ____________________</div></div>
+    <div class="kotak krem"><h3>${t("Puasaku hari ini", "My fast today")}</h3>
+      <span class="cek bulat">${t("Penuh", "Full day")}</span><span class="cek bulat">${t("Setengah hari", "Half day")}</span><span class="cek bulat">${t("Sedang belajar", "Still learning")}</span>
+      <div class="grid2" style="margin-top:3mm"><div>${t("Menu sahur", "Suhoor")}: ____________________</div><div>${t("Menu buka", "Iftar")}: ____________________</div></div>
     </div>
-    <div class="kotak lembut"><h3>Salatku</h3><div class="salat">
-      ${["Subuh", "Zuhur", "Asar", "Magrib", "Isya", "Tarawih"].map(s => `<span class="cek">${s}</span>`).join("")}</div></div>
+    <div class="kotak lembut"><h3>${t("Salatku", "My prayers")}</h3><div class="salat">
+      ${SALAT.map(s => `<span class="cek">${s}</span>`).join("")}</div></div>
     <div class="grid2">
-      <div class="kotak"><h3>📖 Mengaji</h3><p style="margin:0">Surat / halaman:</p>${garis(1)}</div>
-      <div class="kotak"><h3>🤲 Amal baikku</h3>${garis(2)}</div>
+      <div class="kotak"><h3>📖 ${t("Mengaji", "Quran reading")}</h3><p style="margin:0">${t("Surat / halaman:", "Surah / page:")}</p>${garis(1)}</div>
+      <div class="kotak"><h3>🤲 ${t("Amal baikku", "My good deeds")}</h3>${garis(2)}</div>
     </div>
-    <div class="kotak"><h3>Hari ini aku bersyukur karena…</h3>${garis(2)}</div>
-    <div class="kotak" style="flex:1;margin-bottom:4mm"><h3>✏️ Gambar atau ceritakan hari ini</h3></div>
-    <div class="kotak rasa" style="margin-bottom:4mm"><b>Perasaanku:</b> <span>☀️</span>cerah <span>⛅</span>biasa <span>🌧️</span>mendung</div>
-    <div class="fakta">🌙 <b>Tahukah kamu?</b> ${FAKTA[(n - 1) % FAKTA.length]}</div>`));
+    <div class="kotak"><h3>${t("Hari ini aku bersyukur karena…", "Today I'm thankful for…")}</h3>${garis(2)}</div>
+    <div class="kotak" style="flex:1;margin-bottom:4mm"><h3>✏️ ${t("Gambar atau ceritakan hari ini", "Draw or write about today")}</h3></div>
+    <div class="kotak rasa" style="margin-bottom:4mm"><b>${t("Perasaanku", "My mood")}:</b> <span>☀️</span>${t("cerah", "sunny")} <span>⛅</span>${t("biasa", "okay")} <span>🌧️</span>${t("mendung", "cloudy")}</div>
+    <div class="fakta">🌙 <b>${t("Tahukah kamu?", "Did you know?")}</b> ${FAKTA[(n - 1) % FAKTA.length]}</div>`));
 }
 
 // 7. Teka-teki kata (cari kata), acak tetap supaya hasilnya sama setiap dicetak
-const KATA = ["PUASA", "SAHUR", "HILAL", "BULAN", "ZAKAT", "TARAWIH", "SEDEKAH", "PURNAMA", "TAKJIL", "LEBARAN", "MASJID", "IFTAR"];
+const KATA = EN
+  ? ["RAMADAN", "SUHOOR", "IFTAR", "HILAL", "MOON", "ZAKAT", "TARAWEEH", "SADAQAH", "CRESCENT", "MOSQUE", "QURAN", "EID"]
+  : ["PUASA", "SAHUR", "HILAL", "BULAN", "ZAKAT", "TARAWIH", "SEDEKAH", "PURNAMA", "TAKJIL", "LEBARAN", "MASJID", "IFTAR"];
 const UK = 12, ARAH = [[0, 1], [1, 0], [1, 1]];
 let biji = 1448;
 const acak = () => ((biji = (biji * 1103515245 + 12345) % 2147483648) / 2147483648);
@@ -255,41 +305,52 @@ do {
     return false;
   });
 } while (!ok);
-const ABJAD = "ABCDEFGHIJKLMNOPRSTUWY";
+const ABJAD = EN ? "ABCDEFGHIJKLMNOPRSTUVWY" : "ABCDEFGHIJKLMNOPRSTUWY";
 papan = papan.map(b => b.map(h => h || ABJAD[Math.floor(acak() * ABJAD.length)]));
 const tabel = (kelas, isi) => `<table class="huruf ${kelas}">${papan.map((b, r) =>
   `<tr>${b.map((h, c) => isi(h, r, c)).join("")}</tr>`).join("")}</table>`;
-buku.push(hal(`<span class="pita">Teka-teki</span><h2>Cari Kata Ramadan</h2>
-  <p>Kata-kata bersembunyi mendatar, menurun, dan miring. Lingkari setiap kata yang kamu temukan!</p>
+buku.push(hal(`<span class="pita">${t("Teka-teki", "Puzzle")}</span><h2>${t("Cari Kata Ramadan", "Ramadan Word Search")}</h2>
+  <p>${t("Kata-kata bersembunyi mendatar, menurun, dan miring. Lingkari setiap kata yang kamu temukan!",
+         "Words hide across, down, and diagonally. Circle every word you find!")}</p>
   ${tabel("", h => `<td>${h}</td>`)}
   <div class="daftar">${KATA.map(k => `<span>${k}</span>`).join("")}</div>`));
 
 // 8. Lencana
-const LENCANA = [["🌙", "Puasa Penuh"], ["⏰", "Bangun Sahur"], ["🕌", "Rajin Tarawih"], ["🤲", "Suka Sedekah"],
-  ["🏠", "Bantu Ibu"], ["🧰", "Bantu Ayah"], ["📖", "Rajin Mengaji"], ["💛", "Anak Sabar"], ["✅", "Anak Jujur"],
-  ["🍲", "Berbagi Takjil"], ["🔭", "Pengamat Bulan"], ["⭐", "Malam Ganjil"]];
-buku.push(hal(`<span class="pita">Hadiah</span><h2>Lencana Amal Baik</h2>
-  <p>Ayah dan Bunda: gunting lencana dan berikan saat si kecil berhasil. Boleh diwarnai dulu!</p>
-  <div class="lencana">${LENCANA.map(([i, t]) => `<div><span>${i}</span>${t}</div>`).join("")}</div>`));
+const LENCANA = EN
+  ? [["🌙", "Full Fast"], ["⏰", "Up for Suhoor"], ["🕌", "Taraweeh Star"], ["🤲", "Generous Giver"],
+     ["🏠", "Home Helper"], ["💬", "Kind Words"], ["📖", "Quran Reader"], ["💛", "Patient Heart"], ["✅", "Honest Kid"],
+     ["🍲", "Shared Iftar"], ["🔭", "Moon Watcher"], ["⭐", "Odd Nights"]]
+  : [["🌙", "Puasa Penuh"], ["⏰", "Bangun Sahur"], ["🕌", "Rajin Tarawih"], ["🤲", "Suka Sedekah"],
+     ["🏠", "Bantu Ibu"], ["🧰", "Bantu Ayah"], ["📖", "Rajin Mengaji"], ["💛", "Anak Sabar"], ["✅", "Anak Jujur"],
+     ["🍲", "Berbagi Takjil"], ["🔭", "Pengamat Bulan"], ["⭐", "Malam Ganjil"]];
+buku.push(hal(`<span class="pita">${t("Hadiah", "Rewards")}</span><h2>${t("Lencana Amal Baik", "Good Deed Badges")}</h2>
+  <p>${t("Ayah dan Bunda: gunting lencana dan berikan saat si kecil berhasil. Boleh diwarnai dulu!",
+         "Parents: cut out a badge and give it when your child earns it. Color them in first!")}</p>
+  <div class="lencana">${LENCANA.map(([i, x]) => `<div><span>${i}</span>${x}</div>`).join("")}</div>`));
 
 // 9. Sertifikat
 buku.push(hal(`<div class="sertif">
   ${bulan(5, 30)}
-  <h2>Sertifikat Pejuang Ramadan</h2>
-  <p style="font-size:14pt;margin-top:4mm">Dengan bangga diberikan kepada</p>
+  <h2>${t("Sertifikat Pejuang Ramadan", "Ramadan Champion Certificate")}</h2>
+  <p style="font-size:14pt;margin-top:4mm">${t("Dengan bangga diberikan kepada", "Proudly presented to")}</p>
   <div class="nama">${esc(NAMA)}</div>
-  <p style="font-size:14pt">yang telah berpuasa ______ hari di bulan Ramadan ${TAHUN} H<br>
-    dan berusaha menjadi anak yang lebih baik setiap hari.</p>
-  <div class="ttd"><div>Ayah</div><div>Bunda</div></div></div>`));
+  <p style="font-size:14pt">${t(`yang telah berpuasa ______ hari di bulan Ramadan ${TH}<br>
+    dan berusaha menjadi anak yang lebih baik setiap hari.`, `for fasting ______ days during Ramadan ${TH}<br>
+    and trying to become a better person every day.`)}</p>
+  <div class="ttd">${t("<div>Ayah</div><div>Bunda</div>", "<div>Parent</div><div>Parent</div>")}</div></div>`));
 
 // 10. Kunci jawaban & hak cipta
-buku.push(hal(`<h3>Kunci jawaban Cari Kata</h3>
+buku.push(hal(`<h3>${t("Kunci jawaban Cari Kata", "Word Search answer key")}</h3>
   ${tabel("kunci", (h, r, c) => `<td class="${kunci[r][c] ? "ya" : ""}">${h}</td>`)}
-  <div style="margin-top:auto" class="kotak lembut">
+  <div style="margin-top:auto" class="kotak lembut">${t(`
     <h3>Terima kasih sudah memakai Jurnal Ramadan ${MEREK}</h3>
     <p>Lihat bentuk bulan saat si kecil lahir dan main kuis langit di halaman “Bulan Saat Aku Lahir”.</p>
     <p style="margin:0;font-size:10pt">© ${MEREK}. Boleh dicetak berulang untuk keluarga sendiri.
-      Mohon tidak dijual ulang atau dibagikan ke luar keluarga.</p>
+      Mohon tidak dijual ulang atau dibagikan ke luar keluarga.</p>`, `
+    <h3>Thank you for using the ${MEREK} Ramadan Journal</h3>
+    <p>We hope your family enjoys watching the moon together this Ramadan.</p>
+    <p style="margin:0;font-size:10pt">© ${MEREK}. Personal use only: print as many copies as your own family needs.
+      Please do not resell or share this file.</p>`)}
   </div>`));
 
 document.getElementById("buku").innerHTML = buku.join("");
