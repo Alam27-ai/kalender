@@ -88,8 +88,8 @@
     Tanggal Hijriah dan weton berganti saat maghrib, jadi yang lahir malam hari ikut hari berikutnya
     (sebagian keluarga atau daerah memakai patokan lain).
     Tanggal Hijriah memakai kalender hisab urfi (tabular), jadi bisa beda 1–2 hari dari kalender resmi
-    Kemenag, karena awal bulan resmi ditentukan lewat hisab dan rukyat hilal. Rentang: 1900–2100 M
-    (1317–1524 H).</p>
+    Kemenag, karena awal bulan resmi ditentukan lewat hisab dan rukyat hilal. Rentang: 1800–2100 M
+    (1214–1524 H).</p>
   <p class="kecil">Dibuat oleh Langit Cilik.</p>
 </main>
 
@@ -156,8 +156,8 @@ $("hitung").onclick = () => {
   $("hasil").style.display = "none";
   let jd, jw, langkah;
   if (keHijri) {
-    const ok = y >= 1900 && y <= 2100 && new Date(Date.UTC(y, m - 1, d)).getUTCDate() === d;
-    if (!d || !ok) { $("salah").textContent = "Tanggal Masehi belum benar (rentang 1900–2100). Contoh: 17 Agustus 2015."; return; }
+    const ok = y >= 1800 && y <= 2100 && new Date(Date.UTC(y, m - 1, d)).getUTCDate() === d;
+    if (!d || !ok) { $("salah").textContent = "Tanggal Masehi belum benar (rentang 1800–2100). Contoh: 17 Agustus 2015."; return; }
     jd = masehiKeJd(y, m, d);
     jw = $("maghrib").checked ? jd + 1 : jd;
     const [hy, hm, hd] = jdKeHijri(jw), n = jw - EPOCH_H;
@@ -173,12 +173,12 @@ $("hitung").onclick = () => {
       `Bulan ganjil 30 hari, bulan genap 29 hari (Zulhijah 30 hari di tahun kabisat). Sisa harinya jatuh di <b>${hd} ${BULAN_H[hm - 1]}</b>.`,
     ];
   } else {
-    const ok = y >= 1317 && y <= 1524 && d >= 1 && d <= 30;
+    const ok = y >= 1214 && y <= 1524 && d >= 1 && d <= 30;
     jd = ok ? hijriKeJd(y, m, d) : 0;
     const cek = ok ? jdKeHijri(jd) : [];
     if (!ok || cek[0] !== y || cek[1] !== m || cek[2] !== d) {
       $("salah").textContent = ok ? `${d} ${BULAN_H[m - 1]} ${y} H tidak ada: bulan ini hanya 29 hari di kalender urfi.`
-                                  : "Tanggal Hijriah belum benar (rentang 1317–1524 H). Contoh: 1 Ramadan 1447.";
+                                  : "Tanggal Hijriah belum benar (rentang 1214–1524 H). Contoh: 1 Ramadan 1447.";
       return;
     }
     const [gy, gm, gd] = jdKeMasehi(jd);
